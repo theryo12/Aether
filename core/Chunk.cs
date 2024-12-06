@@ -15,7 +15,6 @@ namespace Aether.Core;
 public struct Chunk : IEnumerable<int>
 {
     private const int MaxEntities = 1024; // chunk capacity
-    private const int BitsPerInt = 32; // number of bits in an integer, for mask calculations
     private const int MaxComponents = 64; // maximum components per entity, constrained by mask size
 
     private int _entityCount;
