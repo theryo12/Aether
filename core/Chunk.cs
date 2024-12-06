@@ -84,7 +84,7 @@ public struct Chunk : IEnumerable<int>
     }
 
     /// <summary>
-    /// Copies all data from another chunk into this one.
+    ///     Copies all data from another chunk into this one.
     /// </summary>
     /// <param name="source">The source chunk to copy from.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -98,7 +98,7 @@ public struct Chunk : IEnumerable<int>
     }
 
     /// <summary>
-    /// Provides a span over the memory offsets for a specific component of an entity.
+    ///     Provides a span over the memory offsets for a specific component of an entity.
     /// </summary>
     /// <typeparam name="T">The type of the component.</typeparam>
     /// <param name="entityIndex">The index of the entity in the chunk.</param>
@@ -127,6 +127,9 @@ public struct Chunk : IEnumerable<int>
             throw new IndexOutOfRangeException($"Entity {entityIndex} is out of range.");
     }
 
+    /// <summary>
+    /// Calculates the memory offset for a component.
+    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private readonly int CalculateOffset<T>(int entityIndex) where T : struct
     {
