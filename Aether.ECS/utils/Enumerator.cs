@@ -2,18 +2,22 @@ using System.Collections;
 
 namespace Aether.Utils;
 
-public struct Enumerator(int count) : IEnumerator<int>
+public readonly struct Enumerator : IEnumerator<int>
 {
-    private readonly int _count = count;
-    private int _current = -1;
+    private readonly IEnumerator<int> _rangeEnumerator;
 
-    public readonly int Current => _current;
+    public Enumerator(int count)
+    {
+        _rangeEnumerator = Enumerable.Range(0, count).GetEnumerator();
+    }
 
-    readonly object IEnumerator.Current => Current;
+    public int Current => _rangeEnumerator.Current;
 
-    public bool MoveNext() => ++_current < _count;
+    object IEnumerator.Current => Current;
 
-    public void Reset() => _current = -1;
+    public bool MoveNext() => _rangeEnumerator.MoveNext();
 
-    public readonly void Dispose() { }
+    public void Reset() => throw new NotSupportedException("Reset is not supported for this Enumerator.");
+
+    public void Dispose() => _rangeEnumerator.Dispose();
 }

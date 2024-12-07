@@ -43,9 +43,24 @@ public struct ComponentMask(int capacity)
     }
   }
 
+  private static class TypeIDs
+  {
+    internal static int LastID;
+  }
+
+  private static class TypeIDs<T>
+  {
+    public static readonly int ID = Interlocked.Increment(ref TypeIDs.LastID);
+  }
+
   public static int GetBitIndex<T>() where T : struct
   {
-    return typeof(T).GetHashCode() % 1024;
+    int id = TypeIDs<T>.ID;
+    if (id >= 1024)
+    {
+      throw new InvalidOperationException("Exceeded the maximum limit of 1024 unique bit indices.");
+    }
+    return id;
   }
 
   public override readonly bool Equals([NotNullWhen(true)] object? obj)

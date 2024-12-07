@@ -1,6 +1,5 @@
 
 using System.Collections;
-using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Aether.Utils;
@@ -29,7 +28,6 @@ public struct Chunk : IEnumerable<int>
     {
         if (entityCount > MaxEntities)
             throw new ArgumentOutOfRangeException(nameof(entityCount), $"Entity count cannot exceed {MaxEntities}");
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(MaxEntities, entityCount);
 
         _entityCount = entityCount;
         _masks = new ComponentMask[entityCount];
@@ -47,14 +45,12 @@ public struct Chunk : IEnumerable<int>
     /// <typeparam name="T">The type of the component.</typeparam>
     /// <param name="entityIndex">The index of entity in the chunk.</param>
     /// <returnsTrue if component exists; otherwise, false.></returns>
-    [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly bool Has<T>(int entityIndex) where T : struct
     {
         ValidateEntityIndex(entityIndex);
         return _masks[entityIndex].HasBit(ComponentMask.GetBitIndex<T>());
     }
-
     /// <summary>
     ///     Adds a component to the specified entity.
     /// </summary>
@@ -97,21 +93,18 @@ public struct Chunk : IEnumerable<int>
     }
 
     /// <summary>
-    ///     Provides a span over the memory offsets for a specific component of an entity.
+    ///     Provides a span over the memory offsets for a specific component across all entities in the chunk.
     /// </summary>
     /// <typeparam name="T">The type of the component.</typeparam>
-    /// <param name="entityIndex">The index of the entity in the chunk.</param>
+    /// <param name="componentIndex">The index of the component in the chunk.</param>
     /// <returns>A <see cref="Span{T}"/> over the memory offsets for the component.</returns>
-    [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly Span<int> GetSpan<T>(int entityIndex) where T : struct
+    public readonly Span<int> GetSpan<T>() where T : struct
     {
-        ValidateEntityIndex(entityIndex);
-        ref int offset = ref _dataOffsets[entityIndex, ComponentMask.GetBitIndex<T>()];
-        return MemoryMarshal.CreateSpan(ref offset, 1);
+        int componentIndex = ComponentMask.GetBitIndex<T>();
+        return MemoryMarshal.CreateSpan(ref _dataOffsets[0, componentIndex], _entityCount);
     }
 
-    [Pure]
     public readonly Enumerator GetEnumerator() => new(_entityCount);
 
     readonly IEnumerator<int> IEnumerable<int>.GetEnumerator() => GetEnumerator();
