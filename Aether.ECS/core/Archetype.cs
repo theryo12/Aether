@@ -27,7 +27,7 @@ public struct Slot(int index, int chunkIndex)
 }
 
 // TODO: finish that
-public partial class Archetype : IEnumerable<(int chunkIndex, int entityIndex)>
+/* public partial class Archetype : IEnumerable<(int chunkIndex, int entityIndex)>
 {
     private readonly ComponentMask _mask;
     private readonly List<Chunk> _chunks;
@@ -63,4 +63,4 @@ public partial class Archetype : IEnumerable<(int chunkIndex, int entityIndex)>
     {
 
     }
-}
+} */
