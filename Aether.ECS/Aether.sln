@@ -5,6 +5,8 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aether", "Aether.csproj", "{054F3B5B-1F95-4D46-B88E-F4F3D73B4A7C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aether.Tests", "..\Aether.Tests\Aether.Tests.csproj", "{E4027906-D6B6-460B-BB3C-B98589BF639E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{054F3B5B-1F95-4D46-B88E-F4F3D73B4A7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{054F3B5B-1F95-4D46-B88E-F4F3D73B4A7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{054F3B5B-1F95-4D46-B88E-F4F3D73B4A7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4027906-D6B6-460B-BB3C-B98589BF639E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4027906-D6B6-460B-BB3C-B98589BF639E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4027906-D6B6-460B-BB3C-B98589BF639E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4027906-D6B6-460B-BB3C-B98589BF639E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

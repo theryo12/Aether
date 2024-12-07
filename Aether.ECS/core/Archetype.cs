@@ -1,3 +1,4 @@
+using System.Collections;
 using Aether.Utils;
 
 namespace Aether.Core;
@@ -51,5 +52,15 @@ public partial class Archetype : IEnumerable<(int chunkIndex, int entityIndex)>
         ref var source = ref _chunks[sourceChunkIndex].GetSpan<T>(sourceEntityIndex);
         ref var target = ref _chunks[targetChunkIndex].GetSpan<T>(targetEntityIndex);
         target = source;
+    }
+
+    public IEnumerator<(int chunkIndex, int entityIndex)> GetEnumerator()
+    {
+        throw new NotImplementedException();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+
     }
 }
