@@ -6,6 +6,9 @@ using Aether.Tests.Utils;
 
 namespace Aether.Tests.Core;
 
+// TODO: docs
+// test if that works
+
 public class TestRunner
 {
     private readonly ConcurrentQueue<string> _results = new();

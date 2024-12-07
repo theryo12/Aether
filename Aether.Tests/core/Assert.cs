@@ -1,5 +1,7 @@
 namespace Aether.Tests.Core;
 
+// TODO: docs
+// make areequal, istrue one method
 public static class Assert
 {
     public static void AreEqual<T>(T expected, T actual, string? message = null) where T : IEquatable<T>
