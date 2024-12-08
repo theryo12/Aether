@@ -7,8 +7,6 @@ using Aether.Tests.Utils;
 namespace Aether.Tests.Core;
 
 // TODO: docs
-// maybe make it show memory usage and memory leaks?
-// also make it show results at the end of testing.
 
 public class TestRunner
 {
