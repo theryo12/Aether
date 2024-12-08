@@ -1,46 +1,65 @@
+using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Text;
+using Aether.Utils;
 
 namespace Aether.Core;
 
 // TODO: docs
-
-public struct ComponentMask(int capacity)
+public struct ComponentMask : IDisposable
 {
   private const int BitsPerInt = 32;
-  private int[] _mask = new int[capacity / BitsPerInt + (capacity % BitsPerInt == 0 ? 0 : 1)];
 
-  public void GetBitIndices(int index, out int arrayIndex, out int bitIndex)
+  private readonly int[] _mask;
+  private readonly int _capacity;
+
+  public ComponentMask(int capacity)
   {
-    EnsureCapacity(index);
-    arrayIndex = index / BitsPerInt;
-    bitIndex = index % BitsPerInt;
+    _capacity = (capacity + BitsPerInt - 1) / BitsPerInt;
+    _mask = ArrayPool<int>.Shared.Rent(_capacity);
+    Array.Clear(_mask, 0, _capacity);
   }
 
-  public void SetBit(int index)
+  public readonly void Dispose()
   {
-    GetBitIndices(index, out int arrayIndex, out int bitIndex);
-    _mask[arrayIndex] |= (1 << bitIndex);
-  }
-
-  public void ClearBit(int index)
-  {
-    GetBitIndices(index, out int arrayIndex, out int bitIndex);
-    _mask[arrayIndex] |= (1 << bitIndex);
-  }
-
-  public bool HasBit(int index)
-  {
-    GetBitIndices(index, out int arrayIndex, out int bitIndex);
-    return (_mask[arrayIndex] & (1u << bitIndex)) != 0;
-  }
-
-  private void EnsureCapacity(int index)
-  {
-    int requiredCapacity = (index / 32) + 1;
-    if (_mask.Length < requiredCapacity)
+    if (_mask != null)
     {
-      Array.Resize(ref _mask, requiredCapacity);
+      ArrayPool<int>.Shared.Return(_mask);
     }
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public readonly void SetBit(int index)
+  {
+    var (arrayIndex, bitIndex) = GetIndices(index);
+    _mask[arrayIndex] |= 1 << bitIndex;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public readonly void ClearBit(int index)
+  {
+    var (arrayIndex, bitIndex) = GetIndices(index);
+    _mask[arrayIndex] &= ~(1 << bitIndex);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public readonly bool HasBit(int index)
+  {
+    var (arrayIndex, bitIndex) = GetIndices(index);
+    return (_mask[arrayIndex] & (1 << bitIndex)) != 0;
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public readonly void ClearAll()
+  {
+    Array.Clear(_mask, 0, _capacity);
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static (int ArrayIndex, int BitIndex) GetIndices(int index)
+  {
+    return (index / BitsPerInt, index % BitsPerInt);
   }
 
   private static class TypeIDs
@@ -63,30 +82,39 @@ public struct ComponentMask(int capacity)
     return id;
   }
 
-  public override readonly bool Equals([NotNullWhen(true)] object? obj)
-  {
-    if (obj is ComponentMask other)
-    {
-      return _mask.SequenceEqual(other._mask);
-    }
-    return false;
-  }
-
   public override readonly int GetHashCode()
   {
     int hash = 17;
-    foreach (var item in _mask)
+    for (int i = 0; i < _capacity; i++)
     {
-      hash = hash * 31 + item.GetHashCode();
+      hash = (hash * 31) ^ _mask[i];
     }
     return hash;
   }
 
-  public override readonly string ToString()
+  public override readonly bool Equals(object? obj)
   {
-    return string.Join(", ", _mask.Select(m => Convert.ToString(m, 2).PadLeft(32, '0')));
+    if (obj is not ComponentMask other || _capacity != other._capacity)
+      return false;
+
+    for (int i = 0; i < _capacity; i++)
+    {
+      if (_mask[i] != other._mask[i])
+        return false;
+    }
+    return true;
   }
 
-  public static bool operator ==(ComponentMask left, ComponentMask right) => left._mask == right._mask;
+  public override readonly string ToString()
+  {
+    var sb = new StringBuilder();
+    for (int i = 0; i < _capacity; i++)
+    {
+      sb.Append(Convert.ToString(_mask[i], 2).PadLeft(BitsPerInt, '0')).Append(",");
+    }
+    return sb.ToString().TrimEnd(',');
+  }
+
+  public static bool operator ==(ComponentMask left, ComponentMask right) => left.Equals(right);
   public static bool operator !=(ComponentMask left, ComponentMask right) => !(left == right);
 }

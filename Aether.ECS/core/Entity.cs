@@ -2,17 +2,15 @@ using System.Runtime.InteropServices;
 
 namespace Aether.Core;
 
-[StructLayout(LayoutKind.Explicit, Pack = 1)]
+[StructLayout(LayoutKind.Auto, Pack = 1)]
 public readonly struct Entity(int id)
 {
   /// <summary>
   ///     Unique identifier of the entity.
   ///     Stored in a 32-bit integer to minimize memory overhead.
   /// </summary>
-  [FieldOffset(0)]
   public readonly int ID = id;
 
-  [FieldOffset(4)]
   private readonly ComponentMask _componentMask = new();
 
   public override string ToString() => $"Entity({nameof(ID)}: {ID})";

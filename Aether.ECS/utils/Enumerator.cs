@@ -2,14 +2,9 @@ using System.Collections;
 
 namespace Aether.Utils;
 
-public readonly struct Enumerator : IEnumerator<int>
+public readonly struct Enumerator(int count) : IEnumerator<int>
 {
-    private readonly IEnumerator<int> _rangeEnumerator;
-
-    public Enumerator(int count)
-    {
-        _rangeEnumerator = Enumerable.Range(0, count).GetEnumerator();
-    }
+    private readonly IEnumerator<int> _rangeEnumerator = Enumerable.Range(0, count).GetEnumerator();
 
     public int Current => _rangeEnumerator.Current;
 

@@ -7,11 +7,12 @@ using Aether.Tests.Utils;
 namespace Aether.Tests.Core;
 
 // TODO: docs
-// test if that works
+// maybe make it show memory usage and memory leaks?
+// also make it show results at the end of testing.
 
 public class TestRunner
 {
-    private readonly ConcurrentQueue<string> _results = new();
+    private readonly ConcurrentDictionary<string, List<string>> _results = new();
 
     private readonly ConcurrentDictionary<Type, (MethodInfo? setup, MethodInfo? teardown, MethodInfo[] Tests)> _testCache = [];
 
@@ -31,7 +32,7 @@ public class TestRunner
 
             foreach (var test in tests.AsSpan())
             {
-                Run(instance, setup, test, teardown);
+                Run(instance, type.Name, setup, test, teardown);
             }
         });
 
@@ -40,13 +41,17 @@ public class TestRunner
 
     private void PrintResults()
     {
-        foreach (var result in _results)
+        foreach (var kvp in _results)
         {
-            Console.WriteLine(result);
+            Console.WriteLine($"{kvp.Key}");
+            foreach (var result in kvp.Value)
+            {
+                Console.WriteLine($"  {result}");
+            }
         }
     }
 
-    private void Run(object? instance, MethodInfo? setup, MethodInfo test, MethodInfo? teardown)
+    private void Run(object? instance, string className, MethodInfo? setup, MethodInfo test, MethodInfo? teardown)
     {
         var logBuffer = ArrayPool<char>.Shared.Rent(256);
         try
@@ -57,11 +62,12 @@ public class TestRunner
             test.Invoke(instance, null);
             sw.Stop();
 
-            FormatLog(logBuffer, "PASSED", test.Name, sw.ElapsedMilliseconds);
+            FormatLog(logBuffer, "[   OK   ] ", test.Name, sw.ElapsedMilliseconds, className);
         }
         catch (Exception ex)
         {
-            FormatLog(logBuffer, "FAILED", test.Name, 0, ex.Message);
+            var errorMessage = ex.InnerException?.Message ?? ex.Message;
+            FormatLog(logBuffer, "[ FAILED ] ", test.Name, 0, className, errorMessage);
         }
         finally
         {
@@ -70,11 +76,10 @@ public class TestRunner
         }
     }
 
-    private void FormatLog(char[] buffer, string status, string testName, long duration, string? error = null)
+    private void FormatLog(char[] buffer, string status, string testName, long duration, string className, string? error = null)
     {
         var sb = new ValueStringBuilder(buffer);
         sb.Append(status);
-        sb.Append(": ");
         sb.Append(testName);
 
         if (duration > 0)
@@ -90,7 +95,16 @@ public class TestRunner
             sb.Append(error);
         }
 
-        _results.Enqueue(sb.ToString());
+        var formattedLog = sb.ToString();
+
+        _results.AddOrUpdate(
+            className,
+            _ => new List<string> { formattedLog },
+            (_, list) =>
+            {
+                list.Add(formattedLog);
+                return list;
+            });
     }
 
     private void CacheTestMethods()
