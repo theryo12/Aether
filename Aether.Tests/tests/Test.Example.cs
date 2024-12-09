@@ -12,7 +12,9 @@ public class TEST_Example
 
     [Test("this test shows how to use Assert.That!")]
     //    ^ a small description of test so we know what's happening here.
-    // Test attribute is required for every test so our TestRunner knows what exactly he // needs to run. Description is not required, it's used only for readability. You can // leave it as [Test()].
+    // Test attribute is required for every test so our TestRunner knows what exactly he 
+    // needs to run. Description is not required, it's used only for readability. You can 
+    // leave it as [Test()].
     public void ThatTest()
     {
         value = 15;
