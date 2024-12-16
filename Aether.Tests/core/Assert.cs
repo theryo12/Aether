@@ -10,7 +10,7 @@ public static class Assert
             throw new AssertException(message ?? "Assertion Failed: Condition is not true.");
         }
     }
-
+    // this shit is so slow! don't use that, I'll definitely find a way to make this thing better.
     public static void Throws<TException>(Action action, string? message = null) where TException : Exception
     {
         try
